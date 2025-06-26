@@ -1,0 +1,29 @@
+{
+  "name": "nuke_flow",
+  "version": "1.0.0",
+  "description": "## 🎯 **Migration Strategy Overview**",
+  "main": "index.js",
+  "type": "module",
+  "volta": {
+    "node": "20.9.0",
+    "yarn": "4.5.2"
+  },
+  "scripts": {
+    "migrate": "node src/index.js",
+    "migrate:hot": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-aman-kumar-rai:aman-kumar-rai/nuke_flow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jscodeshift": "^17.3.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
