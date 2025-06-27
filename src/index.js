@@ -14,7 +14,7 @@ import {
   shouldSkipDirectory,
   shouldSkipPath,
   createTransformedFilePath,
-} from './utils';
+} from '#utils/index.js';
 
 const inputPath = process.argv[2];
 

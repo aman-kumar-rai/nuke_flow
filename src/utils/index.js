@@ -1,5 +1,5 @@
 import { basename, dirname, extname, join } from 'node:path';
-import { SKIP_DIRS, SKIP_PATHS } from '../constants';
+import { SKIP_DIRS, SKIP_PATHS } from '#constants/index.js';
 
 // check if file is a js file
 const isJSFile = (filePath) => {
