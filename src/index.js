@@ -23,14 +23,12 @@ if (!inputPath) {
   process.exit(1);
 }
 
-// Global statistics
+// Global statistics - only tracking JS files
 const globalStats = {
-  totalFilesEncountered: 0,
-  jsFilesFound: 0,
-  nonJSFilesSkipped: 0,
-  directoriesProcessed: 0,
-  filesProcessedSuccessfully: 0,
-  filesWithErrors: 0,
+  filesProcessed: 0,
+  filesSkipped: 0,
+  filesTransformed: 0,
+  filesWithError: 0,
 };
 
 const globalStartTime = performance.now();
@@ -45,14 +43,10 @@ try {
 const globalEndTime = performance.now();
 console.log('\n🎉 Global Processing Complete!');
 console.log('================================');
-console.log(`📊 Total files encountered: ${globalStats.totalFilesEncountered}`);
-console.log(`📄 JavaScript files found: ${globalStats.jsFilesFound}`);
-console.log(`⏭️  Non-JS files skipped: ${globalStats.nonJSFilesSkipped}`);
-console.log(`📁 Directories processed: ${globalStats.directoriesProcessed}`);
-console.log(
-  `✅ Files processed successfully: ${globalStats.filesProcessedSuccessfully}`,
-);
-console.log(`❌ Files with errors: ${globalStats.filesWithErrors}`);
+console.log(`📄 JS files found: ${globalStats.filesProcessed}`);
+console.log(`⏭️  JS files skipped: ${globalStats.filesSkipped}`);
+console.log(`🔧 Files transformed: ${globalStats.filesTransformed}`);
+console.log(`❌ Files with errors: ${globalStats.filesWithError}`);
 console.log(
   `⏱️  Total execution time: ${(globalEndTime - globalStartTime).toFixed(2)}ms`,
 );
@@ -105,9 +99,9 @@ async function processFile(filePath) {
     console.log(`   ✅ Created: ${basename(transformedFilePath)}`);
     console.log(`   ⏱️  File time: ${(endTime - startTime).toFixed(2)}ms`);
 
-    globalStats.filesProcessedSuccessfully++;
+    globalStats.filesTransformed++;
   } catch (error) {
-    globalStats.filesWithErrors++;
+    globalStats.filesWithError++;
     throw new Error(`Failed to process file: ${error.message}`);
   }
 }
@@ -119,14 +113,12 @@ async function processDirectory(dirPath, depth = 0) {
 
   console.log(`${indent}📁 Processing directory: ${relativePath || '.'}`);
 
-  // Directory-level statistics
+  // Directory-level statistics - only JS files
   const dirStats = {
-    totalFilesEncountered: 0,
-    jsFilesFound: 0,
-    nonJSFilesSkipped: 0,
-    subdirectoriesProcessed: 0,
-    filesProcessedSuccessfully: 0,
-    filesWithErrors: 0,
+    filesProcessed: 0,
+    filesSkipped: 0,
+    filesTransformed: 0,
+    filesWithError: 0,
   };
 
   try {
@@ -152,37 +144,39 @@ async function processDirectory(dirPath, depth = 0) {
         // Recursively process subdirectory
         console.log(`${indent}  📂 Entering subdirectory: ${entry.name}`);
         await processDirectory(fullPath, depth + 1);
-        dirStats.subdirectoriesProcessed++;
-        globalStats.directoriesProcessed++;
       } else if (entry.isFile()) {
-        dirStats.totalFilesEncountered++;
-        globalStats.totalFilesEncountered++;
-
         // Check if path should be skipped (glob patterns)
         if (shouldSkipPath(relativePath)) {
           console.log(`${indent}  ⏭️  Skipping file (glob): ${entry.name}`);
           continue;
         }
 
+        // Only process if it's a JS file
         if (isJSFile(fullPath)) {
-          dirStats.jsFilesFound++;
-          globalStats.jsFilesFound++;
+          dirStats.filesProcessed++;
+          globalStats.filesProcessed++;
+
+          // TODO: Add Flow detection here
+          // For now, we process all JS files
+          // Later: if (!isFlowFile(fullPath)) {
+          //   console.log(`${indent}  ⏭️  Skipping non-Flow JS file: ${entry.name}`);
+          //   dirStats.filesSkipped++;
+          //   globalStats.filesSkipped++;
+          //   continue;
+          // }
 
           try {
             console.log(`${indent}  📝 Processing: ${entry.name}`);
             await processFile(fullPath);
-            dirStats.filesProcessedSuccessfully++;
+            dirStats.filesTransformed++;
           } catch (error) {
             console.error(
               `${indent}  ❌ Error processing ${entry.name}: ${error.message}`,
             );
-            dirStats.filesWithErrors++;
+            dirStats.filesWithError++;
           }
-        } else {
-          console.log(`${indent}  ⏭️  Skipping non-JS file: ${entry.name}`);
-          dirStats.nonJSFilesSkipped++;
-          globalStats.nonJSFilesSkipped++;
         }
+        // Note: Non-JS files are completely ignored, not counted
       }
     }
   } catch (error) {
@@ -194,22 +188,16 @@ async function processDirectory(dirPath, depth = 0) {
 
   const endTime = performance.now();
 
-  // Display directory statistics
-  console.log(`${indent}📊 Directory Summary: ${relativePath || '.'}`);
-  console.log(
-    `${indent}   Files encountered: ${dirStats.totalFilesEncountered}`,
-  );
-  console.log(`${indent}   JS files found: ${dirStats.jsFilesFound}`);
-  console.log(`${indent}   Non-JS skipped: ${dirStats.nonJSFilesSkipped}`);
-  console.log(
-    `${indent}   Subdirectories: ${dirStats.subdirectoriesProcessed}`,
-  );
-  console.log(
-    `${indent}   Successfully processed: ${dirStats.filesProcessedSuccessfully}`,
-  );
-  console.log(`${indent}   Errors: ${dirStats.filesWithErrors}`);
-  console.log(
-    `${indent}   ⏱️  Directory time: ${(endTime - startTime).toFixed(2)}ms`,
-  );
-  console.log(`${indent}${'─'.repeat(50)}`);
+  // Display directory statistics - only if we found JS files
+  if (dirStats.filesProcessed > 0) {
+    console.log(`${indent}📊 Directory Summary: ${relativePath || '.'}`);
+    console.log(`${indent}   JS files found: ${dirStats.filesProcessed}`);
+    console.log(`${indent}   JS files skipped: ${dirStats.filesSkipped}`);
+    console.log(`${indent}   Files transformed: ${dirStats.filesTransformed}`);
+    console.log(`${indent}   Files with errors: ${dirStats.filesWithError}`);
+    console.log(
+      `${indent}   ⏱️  Directory time: ${(endTime - startTime).toFixed(2)}ms`,
+    );
+    console.log(`${indent}${'─'.repeat(40)}`);
+  }
 }
