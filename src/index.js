@@ -153,15 +153,6 @@ async function processDirectory(dirPath, depth = 0) {
           dirStats.filesProcessed++;
           globalStats.filesProcessed++;
 
-          // TODO: Add Flow detection here
-          // For now, we process all JS files
-          // Later: if (!isFlowFile(fullPath)) {
-          //   console.log(`${indent}  ⏭️  Skipping non-Flow JS file: ${entry.name}`);
-          //   dirStats.filesSkipped++;
-          //   globalStats.filesSkipped++;
-          //   continue;
-          // }
-
           try {
             console.log(`${indent}  📝 Processing: ${entry.name}`);
             await processFile(fullPath);
@@ -172,8 +163,10 @@ async function processDirectory(dirPath, depth = 0) {
             );
             dirStats.filesWithError++;
           }
+        } else {
+          dirStats.filesSkipped++;
+          globalStats.filesSkipped++;
         }
-        // Note: Non-JS files are completely ignored, not counted
       }
     }
   } catch (error) {
