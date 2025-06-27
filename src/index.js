@@ -83,13 +83,10 @@ async function processFile(filePath) {
     // Parse the file
     const root = j(sourceCode);
 
+    // individual steps that would modify the AST go in here
+
     // Recreate source code from AST (no modifications)
-    const transformedCode = root.toSource({
-      quote: 'single',
-      trailingComma: true,
-      tabWidth: 2,
-      useTabs: false,
-    });
+    const transformedCode = root.toSource();
 
     // Write the transformed file
     const transformedFilePath = createTransformedFilePath(filePath);
