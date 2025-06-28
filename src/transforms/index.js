@@ -9,10 +9,10 @@ const transform = async (filePath) => {
 
   // read the file
   const sourceCode = await readFile(filePath, 'utf8');
-  const root = jscodeshift(sourceCode);
+  const root = j(sourceCode);
 
   cleanupAnnotations(root, j);
-  //   cleanupImports(root, j);
+  cleanupImports(root, j);
   //   cleanupExports(root, j);
 
   return root.toSource();
