@@ -7,7 +7,8 @@
   "imports": {
     "#/*": "./src/*",
     "#utils/*": "./src/utils/*",
-    "#constants/*": "./src/constants/*"
+    "#constants/*": "./src/constants/*",
+    "#transforms/*": "./src/transforms/*"
   },
   "volta": {
     "node": "20.9.0",

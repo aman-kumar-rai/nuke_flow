@@ -1,12 +1,4 @@
-import jscodeshift from 'jscodeshift';
-import {
-  readFile,
-  writeFile,
-  access,
-  constants,
-  readdir,
-  stat,
-} from 'node:fs/promises';
+import { writeFile, access, constants, readdir, stat } from 'node:fs/promises';
 import { resolve, basename, join, relative } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import {
@@ -15,6 +7,7 @@ import {
   shouldSkipPath,
   createTransformedFilePath,
 } from '#utils/index.js';
+import { transform } from '#transforms/index.js';
 
 const inputPath = process.argv[2];
 
@@ -76,17 +69,9 @@ async function processPath(inputPath) {
 async function processFile(filePath) {
   const startTime = performance.now();
 
-  const sourceCode = await readFile(filePath, 'utf8');
-  const j = jscodeshift.withParser('flow');
-
   try {
-    // Parse the file
-    const root = j(sourceCode);
-
-    // individual steps that would modify the AST go in here
-
-    // Recreate source code from AST (no modifications)
-    const transformedCode = root.toSource();
+    // Recreate source code from AST
+    const transformedCode = await transform(filePath);
 
     // Write the transformed file
     const transformedFilePath = createTransformedFilePath(filePath);
