@@ -1,8 +1,8 @@
 import jscodeshift from 'jscodeshift';
 import { readFile } from 'node:fs/promises';
-import { cleanupAnnotations } from '#transforms/annotations.js';
-import { cleanupImports } from '#transforms/imports.js';
-import { cleanupExports } from '#transforms/exports.js';
+import { annotations } from '#transforms/annotations.js';
+import { imports } from '#transforms/imports.js';
+import { exports } from '#transforms/exports.js';
 
 const transform = async (filePath) => {
   const j = jscodeshift.withParser('flow');
@@ -11,9 +11,9 @@ const transform = async (filePath) => {
   const sourceCode = await readFile(filePath, 'utf8');
   const root = j(sourceCode);
 
-  cleanupAnnotations(root, j);
-  cleanupImports(root, j);
-  cleanupExports(root, j);
+  annotations(root, j);
+  imports(root, j);
+  exports(root, j);
 
   return root.toSource();
 };

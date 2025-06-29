@@ -1,13 +1,4 @@
-const cleanupExports = (root, j) => {
-  //   root.find(j.ExportNamedDeclaration).forEach((path) => {
-  //     if (
-  //       path.value.exportKind === 'type' ||
-  //       path.value.exportKind === 'typeof'
-  //     ) {
-  //       path.value.exportKind = 'value';
-  //     }
-  //   });
-
+const exports = (root, j) => {
   root.find(j.ExportNamedDeclaration).forEach((path) => {
     const node = path.node;
     // Only handle type or typeof exports
@@ -26,4 +17,4 @@ const cleanupExports = (root, j) => {
   });
 };
 
-export { cleanupExports };
+export { exports };

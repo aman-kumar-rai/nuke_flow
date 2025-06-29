@@ -1,4 +1,4 @@
-const cleanupImports = (root, j) => {
+const imports = (root, j) => {
   root.find(j.ImportDeclaration).forEach((path) => {
     if (
       path.value.importKind === 'type' ||
@@ -9,4 +9,4 @@ const cleanupImports = (root, j) => {
   });
 };
 
-export { cleanupImports };
+export { imports };
