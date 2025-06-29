@@ -13,7 +13,7 @@ const transform = async (filePath) => {
 
   cleanupAnnotations(root, j);
   cleanupImports(root, j);
-  //   cleanupExports(root, j);
+  cleanupExports(root, j);
 
   return root.toSource();
 };
